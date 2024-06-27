@@ -1,0 +1,11 @@
+version: '3.3'  # Or the version you prefer
+
+services:
+  llaserver:  # Replace with a suitable name for your service
+    build:
+      context: .    # The directory containing your Dockerfile
+      dockerfile: Dockerfile  # Or the specific filename if it's different
+      args:  # Pass proxy settings as build arguments
+        - HTTP_PROXY=http://172.16.2.254:3128
+        - HTTPS_PROXY=http://172.16.2.254:3128
+        - NO_PROXY=localhost,127.0.0.1
