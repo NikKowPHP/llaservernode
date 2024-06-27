@@ -8,6 +8,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "Logging": "^1.0.1",
+    "pm2": "^5.4.1",
     "winston": "^3.13.0"
   },
   "name": "llaserver",
