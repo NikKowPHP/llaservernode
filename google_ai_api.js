@@ -1,17 +1,18 @@
 const os = require('os');
-const { load } = require('dotenv');
-const { promisify } = require('util');
-const { generateText } = require('@google/generative-ai');
+const dotenv = require('dotenv');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 const logging = require('Logging');
 
-const loadEnv = promisify(load);
+dotenv.config();
+// Access environment variables directly using process.env
+const apiKey = process.env.GOOGLE_API_KEY;
 
-const logger = logging.getLogger(__name__);
+const logger = logging;
 
 class GoogleAiApi {
   constructor() {
     this.systemPrompt = null;
-    this._apiKey = null;
+    this.googleAI = new GoogleGenerativeAI(apiKey);
     this._model = null;
     this.generationConfig = {
       temperature: 0.5,
@@ -52,8 +53,8 @@ class GoogleAiApi {
    * @returns {Promise<string>} A promise that resolves to the API key.
    * @private
    */
-  static async _getApiKey() {
-    await loadEnv();
+   async _getApiKey() {
+    
     const apiKey = process.env.GOOGLE_API_KEY;
     if (!apiKey) {
       throw new Error('GOOGLE_API_KEY not found in environment variables');
@@ -66,8 +67,11 @@ class GoogleAiApi {
    * @private
    */
   _initializeModel() {
-    generateText.configure({ apiKey: this._apiKey });
-    this._model = 'models/gemini-1.5-flash';
+    this.model = this.googleAI.getGenerativeModel({ 
+      model: 'models/gemini-1.5-flash', 
+      generationConfig: this.generationConfig,
+      safetySettings: this.safetySettings,
+    });
   }
 
   /**
@@ -76,22 +80,29 @@ class GoogleAiApi {
    * @param {string} systemPrompt The system prompt for the conversation.
    * @returns {Promise<string>} A promise that resolves to the generated text.
    */
-  async generateText(message, systemPrompt) {
+   async generateText(message, systemPrompt = '') { 
+    if (!this.model) {
+      throw new Error('Google AI model not initialized.');
+    }
+
     try {
-      const completion = await generateText({
-        model: this._model,
-        prompt: `${systemPrompt}\n${message}`,
-        temperature: this.generationConfig.temperature,
-        top_k: this.generationConfig.top_k,
-        top_p: this.generationConfig.top_p,
-        maxOutputTokens: this.generationConfig.maxOutputTokens,
-        safetySettings: this.safetySettings,
-      });
-      logger.warning(`API response from Google: ${completion.result}`);
-      return completion.result;
+      const response = await this.model.generateContent([
+        { role: 'user', content: `${systemPrompt}\n${message}` }, 
+      ]);
+
+      const generatedText = response.response?.text();
+
+      if (generatedText) {
+        logger.info(`API response from Google: ${generatedText}`);
+        return generatedText;
+      } else {
+        logger.error('Google AI API returned an empty response.');
+        throw new Error('Google AI API returned an empty response.');
+      }
+
     } catch (error) {
       logger.error(`Google AI API error: ${error}`);
-      throw new Error(`Google API call failed: ${error}`);
+      throw new Error(`Google AI call failed: ${error}`);
     }
   }
 }
