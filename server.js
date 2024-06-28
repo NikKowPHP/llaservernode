@@ -3,8 +3,11 @@ const bodyParser = require('body-parser');
 const GoogleAiApi = require('./google_ai_api');
 const { generateTranslation } = require('./translation_helper'); 
 const { getSentenceSplitPrompt } = require('./sentence_splitter'); // Assuming you have this module
+const cors = require('cors');
 
 const app = express();
+
+app.use(cors()); 
 app.use(bodyParser.json());
 
 // Initialize API instances
