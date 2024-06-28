@@ -35,9 +35,13 @@ app.post('/generate', async (req, res) => {
   try {
     const response = await generalApi.generateText(prompt, ''); 
     res.json({ response });
-  } catch (error) {
-    console.error('Error generating text:', error);
-    res.status(400).json({ error: error.message });
+  }
+  catch (error) {
+    console.error('Error in /generate route:', error);
+    if (error.response) {
+      console.error('API Error Response:', error.response.data); 
+    } 
+    res.status(500).json({ error: error.message });
   }
 });
 

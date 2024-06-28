@@ -1,13 +1,12 @@
 const os = require('os');
 const dotenv = require('dotenv');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const logging = require('Logging');
+
 
 dotenv.config();
 // Access environment variables directly using process.env
 const apiKey = process.env.GOOGLE_API_KEY;
 
-const logger = logging;
 
 class GoogleAiApi {
   constructor() {
@@ -93,15 +92,15 @@ class GoogleAiApi {
       const generatedText = response.response?.text();
 
       if (generatedText) {
-        logger.info(`API response from Google: ${generatedText}`);
+        console.info(`API response from Google: ${generatedText}`);
         return generatedText;
       } else {
-        logger.error('Google AI API returned an empty response.');
+        console.error('Google AI API returned an empty response.');
         throw new Error('Google AI API returned an empty response.');
       }
 
     } catch (error) {
-      logger.error(`Google AI API error: ${error}`);
+      console.error(`Google AI API error: ${error}`);
       throw new Error(`Google AI call failed: ${error}`);
     }
   }
