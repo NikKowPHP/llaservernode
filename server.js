@@ -46,6 +46,12 @@ app.get('/health', (req, res) => {
   res.status(200).send('OK'); // Simple health check response
 });
 
+app.use((err, req, res, next) => {
+  console.error(err.stack); // Log detailed error stack
+  res.status(500).send('Something went wrong!');
+});
+
+
 
 app.post('/generateTranslation', async (req, res) => {
   const { text, sourceLanguage, targetLanguage, formality, tone } = req.body;
