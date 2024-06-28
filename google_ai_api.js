@@ -67,7 +67,7 @@ class GoogleAiApi {
    */
   _initializeModel() {
     this.model = this.googleAI.getGenerativeModel({ 
-      model: 'models/gemini-1.5-flash', 
+      model: 'gemini-1.5-flash', 
       generationConfig: this.generationConfig,
       safetySettings: this.safetySettings,
     });
