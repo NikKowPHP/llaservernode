@@ -83,6 +83,6 @@ app.post('/splitSentences', async (req, res) => {
 });
 
 const port = 5000;
-app.listen(port, '0.0.0.0', () => {
+app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
