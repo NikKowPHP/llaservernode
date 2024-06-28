@@ -1,18 +1,22 @@
 const os = require('os');
 const dotenv = require('dotenv');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenerativeAI, GoogleGenerativeAIFetchError } = require('@google/generative-ai');
+const tunnel = require('tunnel'); 
+const https = require('https');
 
 
 dotenv.config();
 // Access environment variables directly using process.env
 const apiKey = process.env.GOOGLE_API_KEY;
-
+const proxyHost = process.env.PROXY_HOST;
+const proxyPort = process.env.PROXY_PORT;
 
 class GoogleAiApi {
   constructor() {
     this.systemPrompt = null;
     this.googleAI = new GoogleGenerativeAI(apiKey);
     this._model = null;
+    
     this.generationConfig = {
       temperature: 0.5,
       top_p: 0.95,
@@ -68,8 +72,15 @@ class GoogleAiApi {
   _initializeModel() {
     this.model = this.googleAI.getGenerativeModel({ 
       model: 'gemini-1.5-flash', 
-      generationConfig: this.generationConfig,
-      safetySettings: this.safetySettings,
+      // generationConfig: this.generationConfig,
+      // safetySettings: this.safetySettings,
+    });
+    this.agent = tunnel.httpsOverHttp({ 
+      proxy: {
+        host: proxyHost,
+        port: proxyPort,
+      
+      }
     });
   }
 
@@ -85,9 +96,14 @@ class GoogleAiApi {
     }
 
     try {
+      console.info(`received data ${message}`)
       const response = await this.model.generateContent([
         { role: 'user', content: `${systemPrompt}\n${message}` }, 
-      ]);
+      ], {
+        httpsAgent: this.agent // Pass the agent to the generateContent method
+      });
+      
+      console.info(`processed ${response}`)
 
       const generatedText = response.response?.text();
 
@@ -100,8 +116,14 @@ class GoogleAiApi {
       }
 
     } catch (error) {
-      console.error(`Google AI API error: ${error}`);
-      throw new Error(`Google AI call failed: ${error}`);
+      let errorMessage = `Google AI call failed: ${error.message}`;
+
+      if (error instanceof GoogleGenerativeAIFetchError) {
+        errorMessage += `\nStatus: ${error.status} ${error.statusText}`;
+        if (error.errorDetails && error.errorDetails.length > 0) {
+          errorMessage += `\nDetails: ${JSON.stringify(error.errorDetails, null, 2)}`;
+        }
+      }
     }
   }
 }
