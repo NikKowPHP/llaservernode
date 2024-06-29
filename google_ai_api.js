@@ -99,9 +99,13 @@ class GoogleAiApi {
       console.info(`received data ${message}`)
       const response = await this.model.generateContent([
         { role: 'user', content: `${systemPrompt}\n${message}` }, 
-      ], {
-        httpsAgent: this.agent // Pass the agent to the generateContent method
-      });
+      ]
+      
+      // , {
+      //   httpsAgent: this.agent // Pass the agent to the generateContent method
+      // }
+    
+    );
       
       console.info(`processed ${response}`)
 
@@ -124,6 +128,8 @@ class GoogleAiApi {
           errorMessage += `\nDetails: ${JSON.stringify(error.errorDetails, null, 2)}`;
         }
       }
+      console.error(errorMessage)
+      throw new Error(errorMessage)
     }
   }
 }

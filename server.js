@@ -37,6 +37,7 @@ app.post('/generate', async (req, res) => {
   const { prompt } = req.body;
   try {
     const response = await generalApi.generateText(prompt, ''); 
+    console.dir(response);
     res.json({ response });
   }
   catch (error) {
@@ -101,7 +102,7 @@ app.post('/splitSentences', async (req, res) => {
   }
 });
 
-const port = 5000;
+const port = 5001;
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
