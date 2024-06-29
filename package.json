@@ -15,6 +15,11 @@
   "description": "Tools for interacting with Google AI APIs (translation, sentence splitting).",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
   }
 }
