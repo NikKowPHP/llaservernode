@@ -1,4 +1,5 @@
-const GoogleAiApi = require('./google_ai_api'); // Assuming you have the GoogleAiApi module
+const GoogleAiApi = require("./google_ai_api"); 
+const logger = require('./logger')
 
 /**
  * Creates the system message for the translation task.
@@ -38,7 +39,13 @@ Guidelines:
  * @param {string} tone The desired tone of the translation.
  * @returns {string} The formatted user message.
  */
-function createUserMessage(text, sourceLanguage, targetLanguage, formality, tone) {
+function createUserMessage(
+  text,
+  sourceLanguage,
+  targetLanguage,
+  formality,
+  tone
+) {
   return `
 Follow these steps to translate the provided text:
 
@@ -64,16 +71,39 @@ Input text: "${text}"
  * @param {string} tone The desired tone of the translation.
  * @returns {Promise<string>} A promise that resolves to the API response (JSON string).
  */
-async function generateTranslation(api, text, sourceLang, targetLang, formality, tone) {
+async function generateTranslation({
+  api,
+  text,
+  sourceLanguage,
+  targetLanguage,
+  formality,
+  tone,
+}) {
   const systemPrompt = createSystemMessage(formality);
-  const userPrompt = createUserMessage(text, sourceLang, targetLang, formality, tone);
-  const combinedPrompt = `${systemPrompt}\n${userPrompt}`;
+  const userPrompt = createUserMessage(
+    text,
+    sourceLanguage,
+    targetLanguage,
+    formality,
+    tone
+  );
+  // console.info(` ${text}`)
+
+  const data = {
+    text: text,
+    "Source Lang": sourceLanguage,
+    "Target Lang": targetLanguage,
+    formality: formality,
+    tone: tone,
+  };
+  console.table([data]);
   try {
-    const response = await api.generateText(combinedPrompt, ''); // Assuming generateText takes the combined prompt 
+    const response = await api.generateText(userPrompt, systemPrompt); // Assuming generateText takes the combined prompt
+
     return response;
   } catch (error) {
-    console.error('Error generating translation:', error);
-    throw error; // Re-throw to handle at a higher level if needed 
+    console.error("Error generating translation:", error);
+    throw error; // Re-throw to handle at a higher level if needed
   }
 }
 
