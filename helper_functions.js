@@ -11,7 +11,7 @@ function extractJsonFromResponse(response) {
   
     if (startIndex === -1 || endIndex === -1) {
       console.error("No valid JSON found in the response.");
-      return null; // Or throw an error if you want to handle it differently
+      throw new Error('No valid JSON found in the response.');
     }
   
     const jsonString = response.substring(startIndex, endIndex + 1);
