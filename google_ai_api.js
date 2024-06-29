@@ -86,6 +86,10 @@ class GoogleAiApi {
     if (!this.model) {
       throw new Error('Google AI model not initialized.');
     }
+    
+    if (!message || message.trim() === '') { // Check for empty or whitespace-only messages
+      throw new Error('Message cannot be empty.');
+    }
 
     try {
       logger.info(`received data from front`)
