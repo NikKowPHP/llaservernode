@@ -1,5 +1,5 @@
-const GoogleAiApi = require("./google_ai_api"); 
-const logger = require('./logger')
+const GoogleAiApi = require("./google_ai_api");
+const logger = require("./logger");
 
 /**
  * Creates the system message for the translation task.
@@ -39,13 +39,13 @@ Guidelines:
  * @param {string} tone The desired tone of the translation.
  * @returns {string} The formatted user message.
  */
-function createUserMessage(
+function createUserMessage({
   text,
   sourceLanguage,
   targetLanguage,
   formality,
-  tone
-) {
+  tone,
+}) {
   return `
 Follow these steps to translate the provided text:
 
@@ -80,13 +80,13 @@ async function generateTranslation({
   tone,
 }) {
   const systemPrompt = createSystemMessage(formality);
-  const userPrompt = createUserMessage(
-    text,
-    sourceLanguage,
-    targetLanguage,
-    formality,
-    tone
-  );
+  const userPrompt = createUserMessage({
+    text: text,
+    formality: formality,
+    sourceLanguage: sourceLanguage,
+    targetLanguage: targetLanguage,
+    tone: tone,
+  });
   // console.info(` ${text}`)
 
   const data = {
