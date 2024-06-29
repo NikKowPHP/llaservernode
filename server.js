@@ -98,6 +98,7 @@ app.post("/splitSentences", async (req, res) => {
 });
 
 const port = 5001;
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
+module.exports = { app, server }; // Export app and server
