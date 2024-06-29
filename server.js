@@ -87,23 +87,13 @@ app.post("/splitSentences", async (req, res) => {
   try {
     const response = await sentenceSplitApi.generateText(text, systemPrompt);
     let sentences;
-    try {
       sentences = JSON.parse(response);
       if (!Array.isArray(sentences)) {
         throw new Error("Response is not an array");
       }
-    } catch (error) {
-      // If parsing fails, attempt a simple split
-      console.warn("Model response parsing failed, attempting manual split.");
-      sentences = response
-        .split(/[.!?]+/g)
-        .map((s) => s.trim())
-        .filter(Boolean);
-    }
-    res.json({ sentences });
   } catch (error) {
     console.error("Error splitting sentences:", error);
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
