@@ -1,15 +1,26 @@
 const os = require('os');
 const dotenv = require('dotenv');
 const { GoogleGenerativeAI, GoogleGenerativeAIFetchError } = require('@google/generative-ai');
-const tunnel = require('tunnel'); 
-const https = require('https');
+const winston = require('winston');
 
 
 dotenv.config();
 // Access environment variables directly using process.env
 const apiKey = process.env.GOOGLE_API_KEY;
-const proxyHost = process.env.PROXY_HOST;
-const proxyPort = process.env.PROXY_PORT;
+
+
+// Create a Winston logger
+const logger = winston.createLogger({
+  level: 'info', // Set the desired logging level (info, error, debug, etc.)
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json() // Log in JSON format
+  ),
+  transports: [
+    new winston.transports.Console(), // Log to the console
+    // Add other transports as needed (e.g., file transport)
+  ],
+});
 
 class GoogleAiApi {
   constructor() {
@@ -72,15 +83,7 @@ class GoogleAiApi {
   _initializeModel() {
     this.model = this.googleAI.getGenerativeModel({ 
       model: 'gemini-1.5-flash', 
-      // generationConfig: this.generationConfig,
-      // safetySettings: this.safetySettings,
-    });
-    this.agent = tunnel.httpsOverHttp({ 
-      proxy: {
-        host: proxyHost,
-        port: proxyPort,
-      
-      }
+
     });
   }
 
@@ -96,26 +99,22 @@ class GoogleAiApi {
     }
 
     try {
-      console.info(`received data ${message}`)
-      const response = await this.model.generateContent([
-        { role: 'user', content: `${systemPrompt}\n${message}` }, 
-      ]
+      logger.info(`received data ${message}`)
+      const response = await this.model.generateContent([`${systemPrompt}\n${message}` // The actual text content
+      ], 
       
-      // , {
-      //   httpsAgent: this.agent // Pass the agent to the generateContent method
-      // }
     
     );
       
-      console.info(`processed ${response}`)
+      logger.info(`processed ${response}`)
 
       const generatedText = response.response?.text();
 
       if (generatedText) {
-        console.info(`API response from Google: ${generatedText}`);
+        logger.info(`API response from Google: ${generatedText}`);
         return generatedText;
       } else {
-        console.error('Google AI API returned an empty response.');
+        logger.error('Google AI API returned an empty response.');
         throw new Error('Google AI API returned an empty response.');
       }
 
@@ -128,7 +127,7 @@ class GoogleAiApi {
           errorMessage += `\nDetails: ${JSON.stringify(error.errorDetails, null, 2)}`;
         }
       }
-      console.error(errorMessage)
+      logger.error(errorMessage)
       throw new Error(errorMessage)
     }
   }
