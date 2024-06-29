@@ -1,7 +1,8 @@
 const os = require('os');
 const dotenv = require('dotenv');
 const { GoogleGenerativeAI, GoogleGenerativeAIFetchError } = require('@google/generative-ai');
-const winston = require('winston');
+const extractJsonFromResponse = require('./helper_functions');
+const logger = require('./logger')
 
 
 dotenv.config();
@@ -9,18 +10,6 @@ dotenv.config();
 const apiKey = process.env.GOOGLE_API_KEY;
 
 
-// Create a Winston logger
-const logger = winston.createLogger({
-  level: 'info', // Set the desired logging level (info, error, debug, etc.)
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json() // Log in JSON format
-  ),
-  transports: [
-    new winston.transports.Console(), // Log to the console
-    // Add other transports as needed (e.g., file transport)
-  ],
-});
 
 class GoogleAiApi {
   constructor() {
@@ -99,20 +88,20 @@ class GoogleAiApi {
     }
 
     try {
-      logger.info(`received data ${message}`)
+      logger.info(`received data from front`)
       const response = await this.model.generateContent([`${systemPrompt}\n${message}` // The actual text content
       ], 
       
     
     );
       
-      logger.info(`processed ${response}`)
 
       const generatedText = response.response?.text();
 
       if (generatedText) {
         logger.info(`API response from Google: ${generatedText}`);
-        return generatedText;
+        const parsedData = extractJsonFromResponse(generatedText);
+        return parsedData;
       } else {
         logger.error('Google AI API returned an empty response.');
         throw new Error('Google AI API returned an empty response.');
