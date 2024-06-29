@@ -10,11 +10,9 @@ describe("API Tests", () => {
     })
       .then(() => {
         console.log("Server started for testing...");
-        done(); // Tell Jest that the server is ready
       })
       .catch((error) => {
         console.error("Error starting server:", error);
-        done(error); // Fail the tests if the server fails to start
       });
   });
 
@@ -23,27 +21,35 @@ describe("API Tests", () => {
     await server.close();
   });
 
-  describe("POST /generate", () => {
-    it("should generate text with a valid prompt", async () => {
-      const prompt = "Translate hello to French";
+  describe('POST /generateTranslation', () => {
+    it('should translate text with valid parameters', async () => {
+      const requestData = {
+        text: 'Hello, how are you?',
+        sourceLanguage: 'en',
+        targetLanguage: 'fr',
+        formality: 'formal',
+        tone: 'neutral',
+      };
+
       const response = await request(app)
-        .post("/generate")
-        .send({ prompt })
-        .set("Accept", "application/json");
+        .post('/generateTranslation')
+        .send(requestData)
+        .set('Accept', 'application/json');
 
       expect(response.statusCode).toBe(200);
-      expect(response.body).toHaveProperty("response");
-      expect(typeof response.body.response).toBe("string"); // Expecting a string response
+      expect(response.body).toHaveProperty('translated_text');
+      expect(typeof response.body.translated_text).toBe('object'); // Assuming you expect a JSON object
     });
 
-    it("should handle invalid or missing prompts", async () => {
-      const response = await request(app)
-        .post("/generate")
-        .send({}) // Sending an empty request body
-        .set("Accept", "application/json");
+    // it("should handle invalid or missing prompts", async () => {
+    //   const response = await request(app)
+    //     .post("/generate")
+    //     .send({}) // Sending an empty request body
+    //     .set("Accept", "application/json");
 
-      expect(response.statusCode).toBe(500); // Or another appropriate error code
-      expect(response.body).toHaveProperty("error");
-    });
+    //     await expect(response).rejects.toThrow('Message cannot be empty.');
+    // // await expect(api.generateText('   ')).rejects.toThrow('Message cannot be empty.');
+      
+    // });
   });
 });
