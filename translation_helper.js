@@ -79,6 +79,10 @@ async function generateTranslation({
   formality,
   tone,
 }) {
+  if (!text || text.trim() === '') { // Check for empty or whitespace-only messages
+    throw new Error('Message cannot be empty.');
+  }
+
   const systemPrompt = createSystemMessage(formality);
   const userPrompt = createUserMessage({
     text: text,
