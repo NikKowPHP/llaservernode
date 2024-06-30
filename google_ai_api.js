@@ -3,16 +3,41 @@ const dotenv = require('dotenv');
 const { GoogleGenerativeAI, GoogleGenerativeAIFetchError } = require('@google/generative-ai');
 const extractJsonFromResponse = require('./helper_functions');
 const logger = require('./logger')
-
+const BaseAiApi = require('./interfaces/generative_ai_interface')
 
 dotenv.config();
 // Access environment variables directly using process.env
 const apiKey = process.env.GOOGLE_API_KEY;
 
 
+/**
+ * @typedef {Object} GenerationConfig
+ * @property {number} temperature
+ * @property {number} top_p
+ * @property {number} top_k
+ * @property {number} maxOutputTokens
+ */
 
-class GoogleAiApi {
+/**
+ * @typedef {Object} SafetySetting
+ * @property {string} category
+ * @property {string} threshold
+ */
+
+/**
+ * Class for interacting with the Google AI API.
+ * @class
+ */
+class GoogleAiApi extends BaseAiApi {
+   /**
+   * Creates a new instance of the GoogleAiApi.
+   * @constructor
+   * @param {string} [systemPrompt=null] - The system prompt to use.
+   * @param {GenerationConfig} [generationConfig] - Configuration for text generation.
+   * @param {SafetySetting[]} [safetySettings] - Safety settings for the API.
+   */
   constructor() {
+    super();
     this.systemPrompt = null;
     this.googleAI = new GoogleGenerativeAI(apiKey);
     this._model = null;
@@ -77,11 +102,8 @@ class GoogleAiApi {
   }
 
   /**
-   * Generates text using the Google AI API.
-   * @param {string} message The message to generate text from.
-   * @param {string} systemPrompt The system prompt for the conversation.
-   * @returns {Promise<string>} A promise that resolves to the generated text.
-   */
+   * @inheritdoc
+   */ 
    async generateText(message, systemPrompt = '') { 
     if (!this.model) {
       throw new Error('Google AI model not initialized.');
