@@ -2,7 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const GoogleAiApi = require("./google_ai_api");
 const { generateTranslation } = require("./translation_helper");
-const { getSentenceSplitPrompt } = require("./sentence_splitter"); 
+const { getSentenceSplitPrompt, splitSentences } = require("./sentence_splitter"); 
 
 const logger = require('./logger')
 const cors = require("cors");
@@ -85,12 +85,8 @@ app.post("/splitSentences", async (req, res) => {
   const { text } = req.body;
   const systemPrompt = getSentenceSplitPrompt();
   try {
-    const response = await sentenceSplitApi.generateText(text, systemPrompt);
-    let sentences;
-      sentences = JSON.parse(response);
-      if (!Array.isArray(sentences)) {
-        throw new Error("Response is not an array");
-      }
+    const sentences = await splitSentences(sentenceSplitApi, text, systemPrompt);
+    res.json({ splitted_sentences: sentences});
   } catch (error) {
     console.error("Error splitting sentences:", error);
     res.status(500).json({ error: error.message });
