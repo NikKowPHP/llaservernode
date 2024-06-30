@@ -1,3 +1,5 @@
+const { isValidJson } = require("./helper_functions");
+
 /**
  * Returns the system prompt for sentence splitting.
  * @returns {string} The system prompt.
@@ -96,7 +98,6 @@ function getSentenceSplitPrompt() {
   }
   Please split the provided input sentences into meaningful chunks for language learning flashcards, maintaining the language pair alignment.
   `;
-  
 }
 
 /**
@@ -109,10 +110,13 @@ function getSentenceSplitPrompt() {
 async function splitSentences(model, text, systemPrompt) {
   const prompt = `${systemPrompt}\n\nSplit the following text into sentences:\n\n${text}`;
   try {
-    const response = await model.generateText(prompt, systemPrompt); 
-    return response; 
+    if (!isValidJson(text)) {
+      throw new Error("Invalid JSON input format.");
+    }
+    const response = await model.generateText(prompt, systemPrompt);
+    return response;
   } catch (error) {
-    console.error('Error splitting sentences:', error);
+    console.error("Error splitting sentences:", error);
     throw new Error(`Sentence splitting failed: ${error}`);
   }
 }
