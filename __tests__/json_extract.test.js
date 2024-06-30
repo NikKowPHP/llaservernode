@@ -1,4 +1,4 @@
-const extractJsonFromResponse = require('../helper_functions'); // Assuming your file is named helper_functions.js
+const {extractJsonFromResponse} = require('../helper_functions'); // Assuming your file is named helper_functions.js
 
 describe('extractJsonFromResponse', () => {
   it('should extract and parse valid JSON from a string', () => {

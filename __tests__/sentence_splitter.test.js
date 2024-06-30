@@ -5,7 +5,7 @@ const {
   splitSentences,
 } = require("../sentence_splitter"); // Assuming your sentence splitter is in sentence_splitter.js
 const MockSentenceData = require("../classes/mock_data_class");
-const extractJsonFromResponse = require("../helper_functions"); // Import your Express app
+const {extractJsonFromResponse} = require("../helper_functions"); // Import your Express app
 
 // Set timeout globally for all tests in this file
 jest.setTimeout(20000);
@@ -36,7 +36,7 @@ describe("sentence splitter tests", () => {
       mockData = new MockSentenceData();
     });
 
-    it.only("should return split sentences in JSON format", async () => {
+    it("should return split sentences in JSON format", async () => {
       const languagePair = "fr-en";
       const sentences = mockData.getMockSentencesAsJSON(languagePair);
       const inputData = JSON.stringify(sentences);
@@ -60,7 +60,7 @@ describe("sentence splitter tests", () => {
       });
     });
 
-    it("should handle errors gracefully", async () => {
+    it.only("should handle errors gracefully", async () => {
       const invalidJSON = "This is not valid JSON"; // Invalid input
 
       const response = await request(app)

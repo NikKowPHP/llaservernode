@@ -1,7 +1,7 @@
 const os = require('os');
 const dotenv = require('dotenv');
 const { GoogleGenerativeAI, GoogleGenerativeAIFetchError } = require('@google/generative-ai');
-const extractJsonFromResponse = require('./helper_functions');
+const {extractJsonFromResponse} = require('./helper_functions');
 const logger = require('./logger')
 const BaseAiApi = require('./interfaces/generative_ai_interface')
 
