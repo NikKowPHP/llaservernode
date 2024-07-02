@@ -7,6 +7,7 @@ WORKDIR /app
 # Copy package files and install dependencies
 COPY package*.json ./
 RUN npm install 
+RUN npm install pm2 -g
 
 
 # Copy the rest of your application code 
@@ -16,4 +17,5 @@ COPY . .
 EXPOSE 5000 
 
 # Set the entrypoint command to start your server 
-CMD ["node", "server.js"] 
+# CMD ["node", "server.js"] 
+CMD ["pm2-runtime", "server.js"]

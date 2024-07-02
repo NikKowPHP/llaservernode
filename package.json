@@ -8,14 +8,15 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "pm2": "^5.4.1",
     "winston": "^3.13.0"
   },
   "name": "llaserver",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Tools for interacting with Google AI APIs (translation, sentence splitting).",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "pm2-runtime server.js",
     "test": "jest"
   },
   "devDependencies": {
