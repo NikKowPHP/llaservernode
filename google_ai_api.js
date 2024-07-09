@@ -1,6 +1,6 @@
 const os = require('os');
 const dotenv = require('dotenv');
-const { GoogleGenerativeAI, GoogleGenerativeAIFetchError } = require('@google/generative-ai');
+const { GoogleGenerativeAI, GoogleGenerativeAIFetchError, HarmCategory, HarmBlockThreshold } = require('@google/generative-ai');
 const {extractJsonFromResponse} = require('./helper_functions');
 const logger = require('./logger')
 const BaseAiApi = require('./interfaces/generative_ai_interface')
@@ -49,10 +49,10 @@ class GoogleAiApi extends BaseAiApi {
       maxOutputTokens: 8192,
     };
     this.safetySettings = [
-      { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
-      { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
-      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
-      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' },
+      { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+      { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE }, 
     ];
   }
 
@@ -97,7 +97,7 @@ class GoogleAiApi extends BaseAiApi {
   _initializeModel() {
     this.model = this.googleAI.getGenerativeModel({ 
       model: 'gemini-1.5-flash', 
-
+      safetySettings: this.safetySettings,
     });
   }
 
@@ -117,6 +117,8 @@ class GoogleAiApi extends BaseAiApi {
       logger.info(`received data from front`)
       const response = await this.model.generateContent([`${systemPrompt}\n${message}` // The actual text content
       ], 
+     
+      { safetySettings: this.safetySettings } 
       
     
     );
