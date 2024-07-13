@@ -61,7 +61,6 @@ app.use((err, req, res, next) => {
 //TODO: USE PM2 FOR PRODUCTION
 
 app.post("/generateTranslation", async (req, res) => {
-  console.dir(req.body);
   const { text, sourceLanguage, targetLanguage, formality, tone } = req.body;
   try {
     const translatedText = await generateTranslation({
@@ -94,7 +93,7 @@ app.post("/splitSentences", async (req, res) => {
   }
 });
 
-const port = 5001;
+const port = 5000;
 const server = app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });

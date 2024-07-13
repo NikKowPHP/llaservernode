@@ -97,7 +97,7 @@ class GoogleAiApi extends BaseAiApi {
   _initializeModel() {
     this.model = this.googleAI.getGenerativeModel({ 
       model: 'gemini-1.5-flash', 
-      safetySettings: this.safetySettings,
+      // safetySettings: this.safetySettings,
     });
   }
 
