@@ -117,9 +117,10 @@ class GoogleAiApi extends BaseAiApi {
       logger.info(`received data from front`)
       const response = await this.model.generateContent([`${systemPrompt}\n${message}` // The actual text content
       ], 
-     
-      { safetySettings: this.safetySettings } 
-      
+      {
+        generationConfig: this.generationConfig,
+        safetySettings: this.safetySettings,
+      } 
     
     );
       
