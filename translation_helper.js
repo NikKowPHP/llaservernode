@@ -4,9 +4,10 @@ const logger = require("./logger");
 /**
  * Creates the system message for the translation task.
  * @param {string} formality The desired formality level (e.g., "formal", "informal").
+ * @param {string} tone The desired tone of voice (e.g., "neutral", "humorous", "informative").
  * @returns {string} The formatted system message.
  */
-function createSystemMessage(formality) {
+function createSystemMessage(formality, tone) {
   const baseMessage = `
 You are a professional translator specializing in ${formality} language. Your task is to accurately translate text while adjusting the formality level as needed. You must perform translations with the highest precision and maintain a professional demeanor at all times.
 
@@ -40,6 +41,16 @@ Formality Adjustment for Informal Translation:
 - Feel free to drop honorifics or formal address forms unless they're essential to the meaning
 `;
 
+const slangyInstructions = `
+Tone Adjustment for Slangy Translation:
+Use Colloquialisms and Idioms: Integrate colloquialisms, idioms, and slang that are prevalent in the target language and culture.
+Informal Language: Employ informal contractions, abbreviations, and casual speech patterns.
+Current Slang Trends: Prioritize expressions that reflect the latest slang trends and cultural nuances.
+Playful and Casual Tone: Maintain a light-hearted, playful, and casual tone throughout the translation.
+Cultural Relevance: Adapt the translation to include culturally relevant references and slang unique to the target audience.
+Flexible and Dynamic Language: Avoid formal language; aim for flexibility and dynamism in word choice and sentence structure.
+`;
+
   const outputFormat = `
 Input: You will receive text in a variety of languages for translation, along with the desired formality level.
 
@@ -57,6 +68,9 @@ Output: You will produce a JSON object with the following structure:
     formalitySpecificGuidelines = formalGuidelines;
   } else if (formality === "informal") {
     formalitySpecificGuidelines = informalGuidelines;
+    if(tone === "slangy") {
+      formalitySpecificGuidelines += slangyInstructions;
+    }
   } else {
     formalitySpecificGuidelines = formalGuidelines + informalGuidelines;
   }
@@ -120,7 +134,7 @@ async function generateTranslation({
     throw new Error("Message cannot be empty.");
   }
 
-  const systemPrompt = createSystemMessage(formality);
+  const systemPrompt = createSystemMessage(formality, tone);
   const userPrompt = createUserMessage({
     text: text,
     formality: formality,
