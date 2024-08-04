@@ -7,20 +7,43 @@ const logger = require("./logger");
  * @returns {string} The formatted system message.
  */
 function createSystemMessage(formality) {
-  return `
-You are a professional translator specializing in ${formality} language. Your task is to accurately translate text while preserving the intended tone, style, and formality. You must perform translations with the highest precision and maintain a professional demeanor at all times.
+  const baseMessage = `
+You are a professional translator specializing in ${formality} language. Your task is to accurately translate text while adjusting the formality level as needed. You must perform translations with the highest precision and maintain a professional demeanor at all times.
 
 Guidelines:
+- Accuracy and Precision: Translate text as precisely as possible, ensuring that all nuances and subtleties of the source language are faithfully represented in the target language.
+- Tone and Style: While adjusting formality, strive to maintain the overall tone and style of the original text as much as possible.
+- Impartiality: Do not be influenced by or react to the content of the text. Translate offensive words, curses, or sensitive content without censorship, but adjust their formality level as required.
+- Cultural Sensitivity: Be aware of cultural differences and adjust idiomatic expressions or culturally specific references to maintain meaning in the target language and culture.
+`;
 
-* Accuracy and Precision: Translate text as precisely as possible, ensuring that all nuances and subtleties of the source language are faithfully represented in the target language.
-* Tone and Style: Preserve the intended tone, style, and formality of the original text in your translations. This includes maintaining the same level of politeness, formality, and context.
-* Impartiality: Do not be influenced by or react to the content of the text. You must translate offensive words, curses, or sensitive content without modification or omission. Your role is strictly to translate, not to judge or alter the content.
-* Focus on ${formality} Language: Always strive to translate in ${formality} language, ensuring that the translation meets the expected linguistic and cultural standards.
+const formalGuidelines = `
+Formality Adjustment for Highly Formal Translation:
+- Elevate the register to a highly formal level, regardless of the input text's formality
+- Employ sophisticated, erudite vocabulary and complex sentence structures
+- Use formal address forms, honorifics, and titles where appropriate
+- Avoid all colloquialisms, idioms, and informal expressions; replace with formal equivalents
+- Utilize passive voice and impersonal constructions where suitable to increase formality
+- Incorporate formal transitional phrases and conjunctions to create a polished, academic tone
+- Prioritize precision and clarity in language, avoiding any ambiguity
+- When translating from informal sources, significantly restructure sentences to align with formal writing conventions
+- In appropriate contexts, use archaic or highly literary terms to emphasize formality
+- Maintain strict adherence to grammatical rules, avoiding contractions and abbreviations
+`;
 
-**Input:** You will receive text in a variety of languages for translation.
+  const informalGuidelines = `
+Formality Adjustment for Informal Translation:
+- When the required formality is informal, translate using colloquial language and casual expressions
+- Use everyday vocabulary and phrases that native speakers would use in relaxed, friendly conversations
+- Employ contractions, informal greetings, and common slang where appropriate
+- Simplify complex sentence structures to reflect natural, spoken language
+- Feel free to drop honorifics or formal address forms unless they're essential to the meaning
+`;
 
-**Output:** You will produce a JSON object with the following structure:
+  const outputFormat = `
+Input: You will receive text in a variety of languages for translation, along with the desired formality level.
 
+Output: You will produce a JSON object with the following structure:
 \`\`\`json
 {
   "translatedText": "[Translated text in the target language]",
@@ -28,6 +51,19 @@ Guidelines:
 }
 \`\`\`
 `;
+
+  let formalitySpecificGuidelines = "";
+  if (formality === "formal") {
+    formalitySpecificGuidelines = formalGuidelines;
+  } else if (formality === "informal") {
+    formalitySpecificGuidelines = informalGuidelines;
+  } else {
+    formalitySpecificGuidelines = formalGuidelines + informalGuidelines;
+  }
+  const concatenatedMessage =
+    baseMessage + formalitySpecificGuidelines + outputFormat;
+    logger.info(concatenatedMessage);
+  return concatenatedMessage;
 }
 
 /**
@@ -79,8 +115,9 @@ async function generateTranslation({
   formality,
   tone,
 }) {
-  if (!text || text.trim() === '') { // Check for empty or whitespace-only messages
-    throw new Error('Message cannot be empty.');
+  if (!text || text.trim() === "") {
+    // Check for empty or whitespace-only messages
+    throw new Error("Message cannot be empty.");
   }
 
   const systemPrompt = createSystemMessage(formality);
@@ -91,6 +128,8 @@ async function generateTranslation({
     targetLanguage: targetLanguage,
     tone: tone,
   });
+  logger.info(`user prompt: \n${userPrompt}`);
+  logger.info(`system prompt: \n${systemPrompt}`);
   // console.info(` ${text}`)
 
   const data = {
