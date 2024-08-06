@@ -49,10 +49,22 @@ class GoogleAiApi extends BaseAiApi {
       maxOutputTokens: 8192,
     };
     this.safetySettings = [
-      { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-      { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE }, 
+      { 
+        category: HarmCategory.HARM_CATEGORY_HARASSMENT, 
+        threshold: HarmBlockThreshold.BLOCK_NONE 
+      },
+      { 
+        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, 
+        threshold: HarmBlockThreshold.BLOCK_NONE 
+      },
+      { 
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, 
+        threshold: HarmBlockThreshold.BLOCK_NONE 
+      },
+      { 
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, 
+        threshold: HarmBlockThreshold.BLOCK_NONE 
+      }, 
     ];
   }
 
@@ -97,7 +109,8 @@ class GoogleAiApi extends BaseAiApi {
   _initializeModel() {
     this.model = this.googleAI.getGenerativeModel({ 
       model: 'gemini-1.5-flash', 
-      // safetySettings: this.safetySettings,
+      safetySettings: this.safetySettings,
+      generationConfig: this.generationConfig,
     });
   }
 
@@ -119,7 +132,7 @@ class GoogleAiApi extends BaseAiApi {
       ], 
       {
         generationConfig: this.generationConfig,
-        safetySettings: this.safetySettings,
+        safetySettings: this.safetySettings, // Ensure safety settings are passed here
       } 
     
     );
